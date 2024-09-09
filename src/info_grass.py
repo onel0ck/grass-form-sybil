@@ -1,3 +1,4 @@
+from loguru import logger
 import requests
 
 def login_grass(email: str, password: str, proxy: str = None):
@@ -27,6 +28,7 @@ def login_grass(email: str, password: str, proxy: str = None):
     login_response = session.post("https://api.getgrass.io/login", headers=headers, json=login_data)
     
     if login_response.status_code != 200:
+        logger.error(f"Login failed for {email}. Status code: {login_response.status_code}")
         return {"error": "Login failed", "status_code": login_response.status_code}
     
     login_data = login_response.json()
@@ -38,10 +40,12 @@ def login_grass(email: str, password: str, proxy: str = None):
     user_response = session.get("https://api.getgrass.io/retrieveUser", headers=headers)
     
     if user_response.status_code != 200:
+        logger.error(f"Failed to retrieve user data for {email}. Status code: {user_response.status_code}")
         return {"error": "Failed to retrieve user data", "status_code": user_response.status_code}
     
     user_data = user_response.json()
     
+    logger.success(f"Successfully logged in and retrieved data for {email}")
     return {
         "login_response": login_data,
         "user_data": user_data
