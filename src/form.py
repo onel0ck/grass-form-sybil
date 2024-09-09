@@ -3,8 +3,8 @@ import random
 import time
 from typing import Dict, Any
 import json
+from loguru import logger
 
-from utils import logger
 from config import FORM_ID, CAPTCHA_API_KEY, CAPTCHA_SITE_KEY
 
 class TypeformSubmitter:
@@ -24,7 +24,7 @@ class TypeformSubmitter:
         self.visit_response_id = None
 
     def view_form_open(self) -> None:
-        logger.info("Starting view_form_open")
+        logger.debug("Starting view_form_open")
         url = f"{self.base_url}/forms/{self.form_id}/insights/events/v3/view-form-open"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -49,7 +49,7 @@ class TypeformSubmitter:
         self.visit_response_id = data["response_id"]
 
     def start_submission(self) -> None:
-        logger.info("Starting submission")
+        logger.debug("Starting submission")
         url = f"{self.base_url}/forms/{self.form_id}/start-submission"
         headers = {
             "Accept": "application/json",
@@ -65,10 +65,10 @@ class TypeformSubmitter:
         self.signature = response_json["signature"]
         self.response_id = response_json["submission"]["response_id"]
         self.landed_at = response_json["submission"]["landed_at"]
-        logger.info(f"Submission started. Response ID: {self.response_id}")
+        logger.debug(f"Submission started. Response ID: {self.response_id}")
 
     def see_field(self, field_id: str, previous_field_id: str) -> None:
-        logger.info(f"Seeing field: {field_id}")
+        logger.debug(f"Seeing field: {field_id}")
         url = f"{self.base_url}/forms/{self.form_id}/insights/events/v3/see"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -86,10 +86,10 @@ class TypeformSubmitter:
         }
         response = self.session.post(url, headers=headers, data=data)
         response.raise_for_status()
-        logger.info(f"Field {field_id} seen successfully")
+        logger.debug(f"Field {field_id} seen successfully")
 
     def submit_form(self, data: list, captcha_token: str) -> Dict[str, Any]:
-        logger.info("Submitting form")
+        logger.debug("Submitting form")
         url = f"{self.base_url}/forms/{self.form_id}/complete-submission"
         headers = {
             "Accept": "application/json",
@@ -110,7 +110,6 @@ class TypeformSubmitter:
             }
         }
         
-        
         response = self.session.post(url, headers=headers, json=payload)
         
         if response.status_code != 200:
@@ -118,14 +117,14 @@ class TypeformSubmitter:
             logger.error(f"Response content: {response.text}")
             response.raise_for_status()
         
-        logger.info("Form submitted successfully")
+        logger.success("Form submitted successfully")
         return response.json()
 
     def _generate_random_id(self) -> str:
         return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', k=12))
 
 def solve_captcha_with_capmonster(api_key: str, site_key: str, url: str) -> str:
-    logger.info("Starting captcha solving process with CapMonster")
+    logger.debug("Starting captcha solving process with CapMonster")
     capmonster_url = "https://api.capmonster.cloud/createTask"
     get_result_url = "https://api.capmonster.cloud/getTaskResult"
 
@@ -148,7 +147,7 @@ def solve_captcha_with_capmonster(api_key: str, site_key: str, url: str) -> str:
         raise Exception(error_msg)
     
     task_id = task_result["taskId"]
-    logger.info(f"Captcha task created. Task ID: {task_id}")
+    logger.debug(f"Captcha task created. Task ID: {task_id}")
     
     for attempt in range(30):
         time.sleep(2)
@@ -161,9 +160,9 @@ def solve_captcha_with_capmonster(api_key: str, site_key: str, url: str) -> str:
         result = response.json()
         
         if result.get("status") == "ready":
-            logger.info("Captcha solved successfully")
+            logger.success("Captcha solved successfully")
             return result["solution"]["gRecaptchaResponse"]
-        logger.info(f"Waiting for captcha solution. Attempt {attempt + 1}/30")
+        logger.debug(f"Waiting for captcha solution. Attempt {attempt + 1}/30")
     
     logger.error("Captcha solving timeout")
     raise Exception("Captcha solving timeout")
@@ -211,7 +210,7 @@ def submit_typeform(data: Dict[str, Any], proxy: str) -> Dict[str, Any]:
         )
         
         result = submitter.submit_form(form_data, captcha_token)
-        logger.info("Form submission completed")
+        logger.success("Form submission completed")
         return result
     except Exception as e:
         logger.error(f"An error occurred during form submission: {str(e)}")
