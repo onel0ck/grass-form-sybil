@@ -1,4 +1,5 @@
 import time
+import random
 from typing import Dict, Any, List
 from loguru import logger
 from utils import (
@@ -21,6 +22,7 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
             grass_data = login_grass(email, password, proxy)
             if "error" in grass_data:
                 logger.error(f"Failed to get data for {email}: {grass_data['error']}")
+                time.sleep(random.uniform(5, 10))
                 continue
 
             form_data = {
@@ -37,6 +39,7 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
             if "error" in result:
                 if "400 Client Error" in str(result["error"]):
                     logger.warning(f"Attempt {attempt + 1}/{max_retries}: 400 Error for {email}. Retrying with a different proxy.")
+                    time.sleep(random.uniform(10, 20))
                     continue
                 else:
                     logger.error(f"Failed to submit form for {email}: {result['error']}")
@@ -48,6 +51,7 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
             logger.error(f"An unexpected error occurred while processing {email}: {str(e)}")
             if attempt < max_retries - 1:
                 logger.debug(f"Retrying with a different proxy. Attempt {attempt + 2}/{max_retries}")
+                time.sleep(random.uniform(15, 30))
             else:
                 return False
     
@@ -89,8 +93,9 @@ def main():
             write_account_result(FAILED_ACCOUNTS_FILE, f"{email}:{password}")
         
         try:
-            logger.info(f"Waiting {TIMEOUT_BETWEEN_ACCOUNTS} seconds before next account...")
-            time.sleep(TIMEOUT_BETWEEN_ACCOUNTS)
+            wait_time = random.uniform(TIMEOUT_BETWEEN_ACCOUNTS, TIMEOUT_BETWEEN_ACCOUNTS * 1.5)
+            logger.info(f"Waiting {wait_time:.2f} seconds before next account...")
+            time.sleep(wait_time)
         except KeyboardInterrupt:
             logger.info("Script interrupted by user. Exiting...")
             break
