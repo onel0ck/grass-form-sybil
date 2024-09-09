@@ -1,0 +1,51 @@
+2024-09-09 10:56:13,390 - INFO - Starting Grass Form submission process...
+2024-09-09 10:56:13,401 - ERROR - An unexpected error occurred in the main function: too many values to unpack (expected 2)
+2024-09-09 10:56:13,401 - INFO - Script execution completed.
+2024-09-09 10:57:59,624 - INFO - Starting Grass Form submission process...
+2024-09-09 10:57:59,624 - ERROR - Failed to read necessary files: name 'read_file_lines' is not defined
+2024-09-09 10:57:59,624 - INFO - Script execution completed.
+2024-09-09 10:58:45,583 - INFO - Starting Grass Form submission process...
+2024-09-09 10:58:46,591 - INFO - Starting view_form_open
+2024-09-09 10:58:47,555 - INFO - Starting submission
+2024-09-09 10:58:47,880 - ERROR - An error occurred during form submission: 400 Client Error:  for url: https://ywnom4oq1na.typeform.com/forms/JuHDsxyx/start-submission
+2024-09-09 10:58:47,882 - ERROR - Failed to submit form for btomezegaz@gmail.com: 400 Client Error:  for url: https://ywnom4oq1na.typeform.com/forms/JuHDsxyx/start-submission
+2024-09-09 10:58:47,882 - INFO - Waiting 52 seconds before next account...
+2024-09-09 10:58:56,311 - INFO - Script interrupted by user. Exiting...
+2024-09-09 10:58:56,311 - INFO - Script execution completed.
+2024-09-09 10:59:30,437 - INFO - Starting Grass Form submission process...
+2024-09-09 10:59:31,865 - INFO - Starting view_form_open
+2024-09-09 10:59:33,125 - INFO - Starting submission
+2024-09-09 10:59:33,490 - INFO - Submission started. Response ID: t7rk4yrae2e2t8m07txit7rk4yofzgsz
+2024-09-09 10:59:33,491 - INFO - Seeing field: 2VqJcP8bGV0U
+2024-09-09 10:59:33,820 - INFO - Field 2VqJcP8bGV0U seen successfully
+2024-09-09 10:59:34,825 - INFO - Seeing field: 2LBfGiV3dViz
+2024-09-09 10:59:35,163 - INFO - Field 2LBfGiV3dViz seen successfully
+2024-09-09 10:59:38,077 - INFO - Seeing field: RKoA09chH2Sr
+2024-09-09 10:59:38,407 - INFO - Field RKoA09chH2Sr seen successfully
+2024-09-09 10:59:40,822 - INFO - Seeing field: QMiTsYmFayJr
+2024-09-09 10:59:41,153 - INFO - Field QMiTsYmFayJr seen successfully
+2024-09-09 10:59:43,965 - INFO - Seeing field: SlEgtoWxA8AK
+2024-09-09 10:59:44,281 - INFO - Field SlEgtoWxA8AK seen successfully
+2024-09-09 10:59:46,179 - INFO - Seeing field: n0sPaB7vXRDW
+2024-09-09 10:59:46,497 - INFO - Field n0sPaB7vXRDW seen successfully
+2024-09-09 10:59:48,483 - INFO - Seeing field: f0ksNMZzCaTw
+2024-09-09 10:59:48,798 - INFO - Field f0ksNMZzCaTw seen successfully
+2024-09-09 10:59:51,373 - INFO - Seeing field: EgLlGtrhVMX5
+2024-09-09 10:59:51,682 - INFO - Field EgLlGtrhVMX5 seen successfully
+2024-09-09 10:59:53,059 - INFO - Seeing field: cXZkbpTb6ikJ
+2024-09-09 10:59:53,368 - INFO - Field cXZkbpTb6ikJ seen successfully
+2024-09-09 10:59:54,991 - INFO - Seeing field: a08yncnElCMX
+2024-09-09 10:59:55,298 - INFO - Field a08yncnElCMX seen successfully
+2024-09-09 10:59:56,558 - INFO - Starting captcha solving process with CapMonster
+2024-09-09 10:59:57,036 - INFO - Captcha task created. Task ID: 387313789
+2024-09-09 10:59:59,412 - INFO - Captcha solved successfully
+2024-09-09 10:59:59,413 - INFO - Submitting form
+2024-09-09 10:59:59,782 - INFO - Form submitted successfully
+2024-09-09 10:59:59,783 - INFO - Form submission completed
+2024-09-09 10:59:59,784 - INFO - Successfully processed account btomezegaz@gmail.com
+2024-09-09 10:59:59,784 - INFO - Waiting 52 seconds before next account...
+2024-09-09 11:00:52,920 - INFO - Starting view_form_open
+2024-09-09 11:00:53,784 - INFO - Starting submission
+2024-09-09 11:00:54,063 - ERROR - An error occurred during form submission: 400 Client Error:  for url: https://ywnom4oq1na.typeform.com/forms/JuHDsxyx/start-submission
+2024-09-09 11:00:54,069 - ERROR - Failed to submit form for stromermiki@outlook.com: 400 Client Error:  for url: https://ywnom4oq1na.typeform.com/forms/JuHDsxyx/start-submission
+2024-09-09 11:00:54,071 - INFO - Waiting 52 seconds before next account...
