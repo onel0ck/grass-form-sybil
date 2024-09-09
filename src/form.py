@@ -4,6 +4,7 @@ import time
 from typing import Dict, Any
 import json
 from loguru import logger
+import uuid
 
 from config import FORM_ID, CAPTCHA_API_KEY, CAPTCHA_SITE_KEY
 
@@ -18,10 +19,21 @@ class TypeformSubmitter:
             }
         self.base_url = f"https://ywnom4oq1na.typeform.com"
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        self.session.headers.update({"User-Agent": self.user_agent})
+        self.session.headers.update({
+            "User-Agent": self.user_agent,
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+        })
         self.response_id = None
         self.signature = None
         self.landed_at = int(time.time())
+
+    def _generate_fingerprint(self):
+        return str(uuid.uuid4())
 
     def start_submission(self) -> None:
         logger.debug("Starting submission")
@@ -32,7 +44,10 @@ class TypeformSubmitter:
             "Origin": self.base_url,
             "Referer": f"{self.base_url}/to/{self.form_id}",
         }
-        data = {"visit_response_id": self._generate_random_id()}
+        data = {
+            "visit_response_id": self._generate_random_id(),
+            "browser_fingerprint": self._generate_fingerprint()
+        }
         
         time.sleep(random.uniform(3, 5))
         try:
@@ -45,6 +60,9 @@ class TypeformSubmitter:
             logger.debug(f"Submission started. Response ID: {self.response_id}")
         except Exception as e:
             logger.error(f"Error in start_submission: {str(e)}")
+            logger.debug(f"Response content: {response.text}")
+            logger.debug(f"Request headers: {headers}")
+            logger.debug(f"Request data: {data}")
             raise
 
     def see_field(self, field_id: str, previous_field_id: str) -> None:
@@ -72,6 +90,7 @@ class TypeformSubmitter:
             logger.debug(f"Field {field_id} seen successfully")
         except Exception as e:
             logger.error(f"Error in see_field: {str(e)}")
+            logger.debug(f"Response content: {response.text}")
             raise
 
     def submit_form(self, data: list, captcha_token: str) -> Dict[str, Any]:
@@ -104,12 +123,14 @@ class TypeformSubmitter:
             return response.json()
         except Exception as e:
             logger.error(f"Error in submit_form: {str(e)}")
-            if hasattr(response, 'status_code') and response.status_code == 400:
-                logger.error(f"Response content: {response.text}")
+            logger.debug(f"Response content: {response.text}")
+            logger.debug(f"Request headers: {headers}")
+            logger.debug(f"Request payload: {payload}")
             raise
 
     def _generate_random_id(self) -> str:
         return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', k=12))
+
 
 def solve_captcha_with_capmonster(api_key: str, site_key: str, url: str) -> str:
     logger.debug("Starting captcha solving process with CapMonster")
