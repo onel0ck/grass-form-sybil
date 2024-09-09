@@ -1,6 +1,6 @@
 import os
-import logging
 from pathlib import Path
+from loguru import logger
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / 'data'
@@ -11,13 +11,11 @@ LOG_RESULT_DIR.mkdir(exist_ok=True)
 TIMEOUT_BETWEEN_ACCOUNTS = 52  #seconds
 TIMEOUT_BETWEEN_REQUESTS = 3  #seconds
 
-CAPTCHA_API_KEY = "api_key" #capmonster
+CAPTCHA_API_KEY = "bbb45880b256654bd9c2e70dbead43c0"
 CAPTCHA_SITE_KEY = "6Ld7p4MpAAAAAGAOAWjUjWlWQNtGusrmEWStu0Jm"
 
 FORM_ID = "JuHDsxyx"
 
-LOGGING_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
-LOGGING_LEVEL = logging.INFO
 LOG_FILE = LOG_RESULT_DIR / 'log.txt'
 
 #path
