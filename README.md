@@ -3,7 +3,7 @@
 I have made only for introductory purposes, I do not encourage anyone to use this software, it is prohibited by law.
 This project automates the process of submitting forms for Grass accounts.
 
-#My LINK: https://x.com/1l0ck
+#My X: https://x.com/1l0ck
 
 ## Setup
 
