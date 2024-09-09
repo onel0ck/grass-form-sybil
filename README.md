@@ -10,7 +10,7 @@ This project automates the process of submitting forms for Grass accounts.
 1. Clone the repository:
    ```
    git clone https://github.com/onel0ck/grass-form-sybil.git
-   cd grass-form-submission
+   cd grass-form-sybil
    ```
 
 2. Create a virtual environment and activate it:
