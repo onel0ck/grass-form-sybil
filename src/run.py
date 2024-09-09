@@ -18,12 +18,14 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            proxy = proxies[attempt % len(proxies)]
+            proxy = random.choice(proxies)
             grass_data = login_grass(email, password, proxy)
             if "error" in grass_data:
                 logger.error(f"Failed to get data for {email}: {grass_data['error']}")
-                time.sleep(random.uniform(5, 10))
+                time.sleep(random.uniform(30, 60))
                 continue
+
+            time.sleep(random.uniform(15, 30))
 
             form_data = {
                 "username": grass_data["user_data"]["result"]["data"]["username"],
@@ -35,11 +37,11 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
                 "qualifiedReferrals": grass_data["user_data"]["result"]["data"]["qualifiedReferrals"]
             }
 
-            result = submit_typeform(form_data, proxy)
+            result = submit_typeform(form_data, proxies)
             if "error" in result:
-                if "400 Client Error" in str(result["error"]):
-                    logger.warning(f"Attempt {attempt + 1}/{max_retries}: 400 Error for {email}. Retrying with a different proxy.")
-                    time.sleep(random.uniform(10, 20))
+                if "400 Client Error" in str(result["error"]) or "DUPLICATE_ERROR" in str(result["error"]) or "404" in str(result["error"]):
+                    logger.warning(f"Attempt {attempt + 1}/{max_retries}: Error for {email}. Error: {result['error']}. Retrying with a different proxy.")
+                    time.sleep(random.uniform(60, 120))
                     continue
                 else:
                     logger.error(f"Failed to submit form for {email}: {result['error']}")
@@ -51,7 +53,7 @@ def process_account(email: str, password: str, proxies: List[str], referral_meth
             logger.error(f"An unexpected error occurred while processing {email}: {str(e)}")
             if attempt < max_retries - 1:
                 logger.debug(f"Retrying with a different proxy. Attempt {attempt + 2}/{max_retries}")
-                time.sleep(random.uniform(15, 30))
+                time.sleep(random.uniform(90, 180))
             else:
                 return False
     
