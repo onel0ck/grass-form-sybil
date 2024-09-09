@@ -16,7 +16,9 @@ This project automates the process of submitting forms for Grass accounts.
 2. Create a virtual environment and activate it:
    ```
    python -m venv venv
-   `venv\Scripts\activate`
+   cd venv/Scripts
+   activate
+   cd ../..
    ```
 
 3. Install the required packages:
@@ -34,7 +36,10 @@ This project automates the process of submitting forms for Grass accounts.
 
 5. Run the script:
    ```
-   python src/run.py
+   cd venv/Scripts
+   activate
+   cd ../..src
+   python run.py
    ```
 
 ## Results
