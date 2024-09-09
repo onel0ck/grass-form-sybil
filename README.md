@@ -24,7 +24,7 @@ This project automates the process of submitting forms for Grass accounts.
    pip install -r requirements.txt
    ```
 
-4. Prepare your data files in the `data` directory:
+4. Prepare the data files in the `data` and `config` directories:
    - `login_password.txt`: Contains login:password pairs (grass account)
    - `proxies.txt`: Contains proxy addresses/ format http://login:password@ip:port only static
    - `referral_methods.txt`: Here write in a column the text that will send the code to the question: “Please explain your method of getting referrals?”
