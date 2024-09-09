@@ -1,7 +1,8 @@
 import time
-from typing import Dict, Any
+from typing import Dict, Any, List
+from loguru import logger
 from utils import (
-    logger, read_proxies, read_login_password, write_account_result,
+    read_proxies, read_login_password, write_account_result,
     read_referral_methods, read_additional_info
 )
 from config import (
@@ -12,33 +13,46 @@ from config import (
 from info_grass import login_grass
 from form import submit_typeform
 
-def process_account(email: str, password: str, proxy: str, referral_method: str, additional_info: str) -> bool:
-    try:
-        grass_data = login_grass(email, password, proxy)
-        if "error" in grass_data:
-            logger.error(f"Failed to get data for {email}: {grass_data['error']}")
-            return False
+def process_account(email: str, password: str, proxies: List[str], referral_method: str, additional_info: str) -> bool:
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            proxy = proxies[attempt % len(proxies)]
+            grass_data = login_grass(email, password, proxy)
+            if "error" in grass_data:
+                logger.error(f"Failed to get data for {email}: {grass_data['error']}")
+                continue
 
-        form_data = {
-            "username": grass_data["user_data"]["result"]["data"]["username"],
-            "email": email,
-            "walletAddress": grass_data["user_data"]["result"]["data"]["walletAddress"],
-            "referralCount": grass_data["user_data"]["result"]["data"]["referralCount"],
-            "referral_methods": referral_method,
-            "additional_info": additional_info,
-            "qualifiedReferrals": grass_data["user_data"]["result"]["data"]["qualifiedReferrals"]
-        }
+            form_data = {
+                "username": grass_data["user_data"]["result"]["data"]["username"],
+                "email": email,
+                "walletAddress": grass_data["user_data"]["result"]["data"]["walletAddress"],
+                "referralCount": grass_data["user_data"]["result"]["data"]["referralCount"],
+                "referral_methods": referral_method,
+                "additional_info": additional_info,
+                "qualifiedReferrals": grass_data["user_data"]["result"]["data"]["qualifiedReferrals"]
+            }
 
-        result = submit_typeform(form_data, proxy)
-        if "error" in result:
-            logger.error(f"Failed to submit form for {email}: {result['error']}")
-            return False
+            result = submit_typeform(form_data, proxy)
+            if "error" in result:
+                if "400 Client Error" in str(result["error"]):
+                    logger.warning(f"Attempt {attempt + 1}/{max_retries}: 400 Error for {email}. Retrying with a different proxy.")
+                    continue
+                else:
+                    logger.error(f"Failed to submit form for {email}: {result['error']}")
+                    return False
 
-        logger.info(f"Successfully processed account {email}")
-        return True
-    except Exception as e:
-        logger.error(f"An unexpected error occurred while processing {email}: {str(e)}")
-        return False
+            logger.success(f"Successfully processed account {email}")
+            return True
+        except Exception as e:
+            logger.error(f"An unexpected error occurred while processing {email}: {str(e)}")
+            if attempt < max_retries - 1:
+                logger.debug(f"Retrying with a different proxy. Attempt {attempt + 2}/{max_retries}")
+            else:
+                return False
+    
+    logger.error(f"Failed to process account {email} after {max_retries} attempts")
+    return False
 
 def main():
     try:
@@ -61,11 +75,10 @@ def main():
 
         email, password = account
         try:
-            proxy = proxies[i % len(proxies)]
             referral_method = referral_methods[i % len(referral_methods)]
             additional_info = additional_infos[i % len(additional_infos)]
             
-            success = process_account(email, password, proxy, referral_method, additional_info)
+            success = process_account(email, password, proxies, referral_method, additional_info)
             
             if success:
                 write_account_result(SUCCESSFUL_ACCOUNTS_FILE, f"{email}:{password}")
