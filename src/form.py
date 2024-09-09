@@ -17,36 +17,11 @@ class TypeformSubmitter:
                 "https": proxy
             }
         self.base_url = f"https://ywnom4oq1na.typeform.com"
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        self.session.headers.update({"User-Agent": self.user_agent})
         self.response_id = None
         self.signature = None
         self.landed_at = int(time.time())
-        self.visit_response_id = None
-
-    def view_form_open(self) -> None:
-        logger.debug("Starting view_form_open")
-        url = f"{self.base_url}/forms/{self.form_id}/insights/events/v3/view-form-open"
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Origin": self.base_url,
-            "Referer": f"{self.base_url}/to/{self.form_id}",
-            "User-Agent": self.user_agent
-        }
-        data = {
-            "form_id": self.form_id,
-            "field_id": "WelcomeScreenID",
-            "response_id": self._generate_random_id(),
-            "user_agent": self.user_agent,
-            "running_experiments": json.dumps([
-                {"test_id": "AB_PulseSurvey_Respond_RESP-1091", "variant_label": "out_of_experiment"},
-                {"test_id": "AB_Rosetta_Cache_Respond_RESP-2532", "variant_label": "variant"}
-            ]),
-            "utm": "[]",
-            "version": "1"
-        }
-        response = self.session.post(url, headers=headers, data=data)
-        response.raise_for_status()
-        self.visit_response_id = data["response_id"]
 
     def start_submission(self) -> None:
         logger.debug("Starting submission")
@@ -56,16 +31,21 @@ class TypeformSubmitter:
             "Content-Type": "application/json; charset=UTF-8",
             "Origin": self.base_url,
             "Referer": f"{self.base_url}/to/{self.form_id}",
-            "User-Agent": self.user_agent
         }
-        data = {"visit_response_id": self.visit_response_id}
-        response = self.session.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        response_json = response.json()
-        self.signature = response_json["signature"]
-        self.response_id = response_json["submission"]["response_id"]
-        self.landed_at = response_json["submission"]["landed_at"]
-        logger.debug(f"Submission started. Response ID: {self.response_id}")
+        data = {"visit_response_id": self._generate_random_id()}
+        
+        time.sleep(random.uniform(3, 5))
+        try:
+            response = self.session.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            response_json = response.json()
+            self.signature = response_json["signature"]
+            self.response_id = response_json["submission"]["response_id"]
+            self.landed_at = response_json["submission"]["landed_at"]
+            logger.debug(f"Submission started. Response ID: {self.response_id}")
+        except Exception as e:
+            logger.error(f"Error in start_submission: {str(e)}")
+            raise
 
     def see_field(self, field_id: str, previous_field_id: str) -> None:
         logger.debug(f"Seeing field: {field_id}")
@@ -74,7 +54,6 @@ class TypeformSubmitter:
             "Content-Type": "application/x-www-form-urlencoded",
             "Origin": self.base_url,
             "Referer": f"{self.base_url}/to/{self.form_id}",
-            "User-Agent": self.user_agent
         }
         data = {
             "form_id": self.form_id,
@@ -84,9 +63,16 @@ class TypeformSubmitter:
             "user_agent": self.user_agent,
             "version": "1"
         }
-        response = self.session.post(url, headers=headers, data=data)
-        response.raise_for_status()
-        logger.debug(f"Field {field_id} seen successfully")
+        
+        time.sleep(random.uniform(0.5, 1.5))
+        
+        try:
+            response = self.session.post(url, headers=headers, data=data)
+            response.raise_for_status()
+            logger.debug(f"Field {field_id} seen successfully")
+        except Exception as e:
+            logger.error(f"Error in see_field: {str(e)}")
+            raise
 
     def submit_form(self, data: list, captcha_token: str) -> Dict[str, Any]:
         logger.debug("Submitting form")
@@ -96,7 +82,6 @@ class TypeformSubmitter:
             "Content-Type": "application/json; charset=UTF-8",
             "Origin": self.base_url,
             "Referer": f"{self.base_url}/to/{self.form_id}",
-            "User-Agent": self.user_agent
         }
         
         payload = {
@@ -110,15 +95,18 @@ class TypeformSubmitter:
             }
         }
         
-        response = self.session.post(url, headers=headers, json=payload)
+        time.sleep(random.uniform(1, 3))
         
-        if response.status_code != 200:
-            logger.error(f"Form submission failed. Status code: {response.status_code}")
-            logger.error(f"Response content: {response.text}")
+        try:
+            response = self.session.post(url, headers=headers, json=payload)
             response.raise_for_status()
-        
-        logger.success("Form submitted successfully")
-        return response.json()
+            logger.success("Form submitted successfully")
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error in submit_form: {str(e)}")
+            if hasattr(response, 'status_code') and response.status_code == 400:
+                logger.error(f"Response content: {response.text}")
+            raise
 
     def _generate_random_id(self) -> str:
         return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', k=12))
@@ -170,7 +158,6 @@ def solve_captcha_with_capmonster(api_key: str, site_key: str, url: str) -> str:
 def submit_typeform(data: Dict[str, Any], proxy: str) -> Dict[str, Any]:
     submitter = TypeformSubmitter(FORM_ID, proxy)
     try:
-        submitter.view_form_open()
         submitter.start_submission()
 
         fields = [
