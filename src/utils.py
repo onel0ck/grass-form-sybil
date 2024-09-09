@@ -1,27 +1,18 @@
-import logging
-import os
+from loguru import logger
+import sys
 from typing import List, Tuple
-from config import LOGGING_FORMAT, LOGGING_LEVEL, LOG_FILE, LOG_RESULT_DIR
+from config import LOG_FILE, LOG_RESULT_DIR
 
 def setup_logger():
-    os.makedirs(LOG_RESULT_DIR, exist_ok=True)
+    LOG_RESULT_DIR.mkdir(exist_ok=True)
 
-    logger = logging.getLogger(__name__)
-    logger.setLevel(LOGGING_LEVEL)
+    logger.remove()
+    
+    logger.add(sys.stderr, format="{time} - {level} - {message}", level="DEBUG")
+    
+    logger.add(LOG_FILE, rotation="10 MB", compression="zip", level="DEBUG")
 
-    formatter = logging.Formatter(LOGGING_FORMAT)
-
-    file_handler = logging.FileHandler(LOG_FILE, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    return logger
-
-logger = setup_logger()
+setup_logger()
 
 def read_file_lines(filename: str) -> List[str]:
     try:
