@@ -29,15 +29,13 @@ This project automates the process of submitting forms for Grass accounts.
    - `proxies.txt`: Contains proxy addresses/ format http://login:password@ip:port only static
    - `referral_methods.txt`: Here write in a column the text that will send the code to the question: “Please explain your method of getting referrals?”
    - `additional_info.txt`: Here write in a column the text that will send the code to the question: “Why do you think your account was mislabeled as having abnormal network activity?”
+   - `config.py`: You can modify the `src/config.py` file to adjust timeouts, API keys, and other settings.
+   - api key capmonster is required
 
 5. Run the script:
    ```
    python src/run.py
    ```
-
-## Configuration
-
-You can modify the `src/config.py` file to adjust timeouts, API keys, and other settings.
 
 ## Results
 
